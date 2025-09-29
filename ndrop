@@ -71,8 +71,8 @@ partial_match() {
 
 wait_online() {
   wait_online=0
-  while [[ $wait_online -lt 200 ]]; do
-    ping -qc 1 github.com && break
+  while [[ $wait_online -lt 100 ]]; do
+    ping -qc 1 -W 0.2 github.com && break
     sleep 0.1
     $wait_online++
   done
@@ -199,7 +199,7 @@ fi
 WINDOW_ID=$(niri msg --json windows | jq -r ".[] | select(.app_id==\"$CLASS\") | .id")
 
 ### OVERRIDE ###
-FOCUS=true
+# FOCUS=true
 
 if [[ -n $(niri msg --json windows | jq -r ".[] | select(.app_id==\"$CLASS\" and .workspace_id!=\"$ACTIVE_WORKSPACE\")") ]]; then
   if [[ $FOCUS == false ]]; then
