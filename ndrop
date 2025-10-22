@@ -196,7 +196,7 @@ if [[ -n $CLASS_OVERRIDE ]]; then
   CLASS="$CLASS_OVERRIDE"
 fi
 
-WINDOW_ID=$(niri msg --json windows | jq -r ".[] | select(.app_id==\"$CLASS\") | .id")
+WINDOW_ID=$(niri msg --json windows | jq -r "first(.[] | select(.app_id==\"$CLASS\") | .id)")
 
 ### OVERRIDE ###
 # FOCUS=true
