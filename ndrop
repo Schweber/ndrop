@@ -144,7 +144,7 @@ fi
 
 CLASS="$1"
 COMMANDLINE="${*:1}"
-ACTIVE_WORKSPACE=$(niri msg --json workspaces | jq -r ".[] | select(.is_focused==true) | .id") || notify "ndrop: Error executing dependencies 'niri msg' or 'jq'" "Check terminal output of 'ndrop $COMMANDLINE'"
+ACTIVE_WORKSPACE=$(niri msg --json workspaces | jq -r ".[] | select(.is_focused==true) | .idx") || notify "ndrop: Error executing dependencies 'niri msg' or 'jq'" "Check terminal output of 'ndrop $COMMANDLINE'"
 
 case "$1" in
 epiphany)
@@ -201,14 +201,16 @@ WINDOW_ID=$(niri msg --json windows | jq -r "first(.[] | select(.app_id==\"$CLAS
 ### OVERRIDE ###
 # FOCUS=true
 
-if [[ -n $(niri msg --json windows | jq -r ".[] | select(.app_id==\"$CLASS\" and .workspace_id!=\"$ACTIVE_WORKSPACE\")") ]]; then
+workspace_id=$(niri msg --json windows | jq -r ".[] | select(.app_id==\"$CLASS\") | .workspace_id")
+
+if [[ -n "$workspace_id" && "$ACTIVE_WORKSPACE" !=  $(niri msg -j workspaces | jq ".[] | select(.id == $workspace_id) | .idx") ]]; then
   if [[ $FOCUS == false ]]; then
     # shellcheck disable=SC2140 # erroneous warning
     niri msg action move-window-to-workspace --window-id "$WINDOW_ID" "$ACTIVE_WORKSPACE" || notify "ndrop: Error moving '$COMMANDLINE' to current workspace"
     if $VERBOSE; then notify_low "ndrop: Matched class '$CLASS' on another workspace and moved it to current workspace"; fi
   fi
   niri msg action focus-window --id "$WINDOW_ID" || notify "ndrop: Error focusing '$COMMANDLINE' on current workspace"
-elif [[ -n $(niri msg --json windows | jq -r ".[] | select(.app_id==\"$CLASS\" and .workspace_id==\"$ACTIVE_WORKSPACE\")") ]]; then
+elif [[ -n "$workspace_id" && "$ACTIVE_WORKSPACE" ==  $(niri msg -j workspaces | jq ".[] | select(.id == $workspace_id) | .idx") ]]; then
   if [[ $FOCUS == false ]]; then
     # shellcheck disable=SC2086 # integers won't be split
     niri msg action move-window-to-workspace --window-id "$WINDOW_ID" "ndrop" || notify "ndrop: Error moving '$COMMANDLINE' to workspace 'ndrop'"
