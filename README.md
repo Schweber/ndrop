@@ -9,6 +9,8 @@ This Bash script emulates the main features of [tdrop](https://github.com/noctui
 > \[!NOTE]
 > Niri doesn't implement scratchpads yet so ndrop is inferior to hdrop until they are added to niri.
 
+There is a modern version of this script available for **nushell** [here](https://github.com/Schweber/nudrop).
+
 #### Usage:
 
 > ndrop [OPTIONS] [COMMAND]
